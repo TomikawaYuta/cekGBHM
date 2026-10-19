@@ -248,6 +248,48 @@ sudo systemctl restart apache2
 
 ---
 
+## Deployment ke Railway (Gratis)
+
+### Langkah Cepat
+
+1. **Push ke GitHub**
+```bash
+git add .
+git commit -m "Setup Railway deployment"
+git push origin main
+```
+
+2. **Deploy ke Railway**
+- Buka [railway.app](https://railway.app) → Login dengan GitHub
+- **New Project** → **Deploy from GitHub repo** → Pilih repo `cekGBHM.github.io`
+
+3. **Setup Database**
+- Klik **+ New** → **Database** → **PostgreSQL**
+
+4. **Environment Variables**
+Tambahkan di tab **Variables**:
+```
+DB_CONNECTION=pgsql
+APP_ENV=production
+APP_DEBUG=false
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+APP_KEY=base64:xxx...  # dari php artisan key:generate --show
+APP_URL=https://your-app.up.railway.app
+```
+
+5. **Deploy Ulang**
+- Klik **Deployments** → **Redeploy**
+
+### Hasil
+
+Aplikasi akan bisa diakses di: `https://your-app.up.railway.app`
+
+> Panduan lengkap: [DEPLOY_RAILWAY.md](DEPLOY_RAILWAY.md)
+
+---
+
 ## Penggunaan
 
 ### Login
