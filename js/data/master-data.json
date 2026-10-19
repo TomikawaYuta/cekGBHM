@@ -1,0 +1,113 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "rule_type": "first_impression",
+      "min_kata": 3,
+      "deskripsi": "First Impression harus minimal 3 kata"
+    },
+    {
+      "id": 2,
+      "rule_type": "paling_berkesan",
+      "min_kata": 3,
+      "deskripsi": "Apa yang paling berkesan harus minimal 3 kata"
+    }
+  ],
+  "quests": [
+    {
+      "id": 1,
+      "chapter": 1,
+      "angkatan": "2026",
+      "jenis_quest": "teman",
+      "deskripsi": "Temukan 15 teman baru",
+      "target_jumlah": 15
+    },
+    {
+      "id": 2,
+      "chapter": 1,
+      "angkatan": "2026",
+      "jenis_quest": "dosen",
+      "deskripsi": "Temui 5 dosen",
+      "target_jumlah": 5
+    },
+    {
+      "id": 3,
+      "chapter": 1,
+      "angkatan": "2026",
+      "jenis_quest": "tempat",
+      "deskripsi": "Kunjungi 3 tempat di kampus",
+      "target_jumlah": 3
+    },
+    {
+      "id": 4,
+      "chapter": 2,
+      "angkatan": "2025",
+      "jenis_quest": "profil_kating",
+      "deskripsi": "Profil mahasiswa angkatan 2025",
+      "target_jumlah": 15
+    },
+    {
+      "id": 5,
+      "chapter": 3,
+      "angkatan": "2024",
+      "jenis_quest": "profil_kating",
+      "deskripsi": "Profil mahasiswa angkatan 2024",
+      "target_jumlah": 5
+    },
+    {
+      "id": 6,
+      "chapter": 4,
+      "angkatan": "2023",
+      "jenis_quest": "profil_kating",
+      "deskripsi": "Profil mahasiswa angkatan 2023",
+      "target_jumlah": 5
+    }
+  ],
+  "panitia": [
+    {
+      "id": 1,
+      "nama": "Ahmad Fauzi",
+      "nim": "20210010001",
+      "jabatan": "Ketua Umum",
+      "challenge_1": "Membuat presentasi",
+      "challenge_2": "Memimpin rapat",
+      "challenge_3": "Mengkoordinasi acara"
+    },
+    {
+      "id": 2,
+      "nama": "Siti Nurhaliza",
+      "nim": "20210010002",
+      "jabatan": "Wakil Ketua",
+      "challenge_1": "Mengelola keuangan",
+      "challenge_2": "Membuat laporan",
+      "challenge_3": "Mengatur jadwal"
+    },
+    {
+      "id": 3,
+      "nama": "Budi Santoso",
+      "nim": "20210010003",
+      "jabatan": "Sekretaris",
+      "challenge_1": "Membuat notulen",
+      "challenge_2": "Mengelola arsip",
+      "challenge_3": "Membuat surat"
+    },
+    {
+      "id": 4,
+      "nama": "Dewi Kartika",
+      "nim": "20210010004",
+      "jabatan": "Bendahara",
+      "challenge_1": "Mencatat pemasukan",
+      "challenge_2": "Membuat anggaran",
+      "challenge_3": "Mengelola kas"
+    },
+    {
+      "id": 5,
+      "nama": "Rudi Hartono",
+      "nim": "20210010005",
+      "jabatan": "Koord. Acara",
+      "challenge_1": "Merancang acara",
+      "challenge_2": "Mengundang narasumber",
+      "challenge_3": "Mengurus izin"
+    }
+  ]
+}

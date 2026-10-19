@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Validasi - Sistem Pengecekan GBHM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body class="bg-gray-100 min-h-screen" data-page="results">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="text-xl font-bold text-indigo-600">GBHM Checker</a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="index.html" data-nav="dashboard" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Dashboard</a>
+                        <a href="upload.html" data-nav="upload" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Upload</a>
+                        <a href="results.html" data-nav="results" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Hasil</a>
+                        <a href="panitia.html" data-nav="panitia" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Panitia</a>
+                        <a href="quest.html" data-nav="quest" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Quest</a>
+                        <a href="rules.html" data-nav="rules" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Rules</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 px-4">
+        <div id="sessionFilename" class="hidden"></div>
+        <div id="content" class="max-w-6xl mx-auto">
+            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">Memuat hasil...</div>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/result-detail.js"></script>
+</body>
+</html>

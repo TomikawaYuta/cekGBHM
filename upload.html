@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF GBHM - Sistem Pengecekan GBHM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body class="bg-gray-100 min-h-screen" data-page="upload">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="text-xl font-bold text-indigo-600">GBHM Checker</a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="index.html" data-nav="dashboard" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Dashboard</a>
+                        <a href="upload.html" data-nav="upload" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Upload</a>
+                        <a href="results.html" data-nav="results" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Hasil</a>
+                        <a href="panitia.html" data-nav="panitia" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Panitia</a>
+                        <a href="quest.html" data-nav="quest" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Quest</a>
+                        <a href="rules.html" data-nav="rules" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Rules</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h1 class="text-xl font-semibold text-gray-800">Upload File GBHM</h1>
+                    <p class="text-sm text-gray-500 mt-1">Upload file PDF GBHM untuk validasi otomatis</p>
+                </div>
+
+                <form class="p-6" id="uploadForm">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-indigo-500 transition-colors"
+                         id="dropZone">
+                        <input type="file" name="pdf_file" id="pdf_file" accept=".pdf,application/pdf" class="hidden" required>
+                        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="mt-4 text-lg text-gray-600">Drag & drop file PDF di sini</p>
+                        <p class="mt-2 text-sm text-gray-500">atau</p>
+                        <button type="button" id="browseBtn"
+                                class="mt-2 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+                            Pilih File
+                        </button>
+                        <p class="mt-4 text-xs text-gray-400">Maksimal 10MB, format .pdf</p>
+                    </div>
+
+                    <div id="filePreview" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <svg class="h-8 w-8 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <p class="font-medium text-gray-800" id="fileName"></p>
+                                    <p class="text-sm text-gray-500" id="fileSize"></p>
+                                </div>
+                            </div>
+                            <button type="button" id="removeFile" class="text-red-600 hover:text-red-800">
+                                &times; Hapus
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="alertBox"></div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" id="submitBtn"
+                                class="bg-indigo-600 text-white px-8 py-3 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
+                            Upload & Validasi
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Upload History -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">Riwayat Upload</h2>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200" id="historyBody">
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Memuat...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/upload.js"></script>
+</body>
+</html>
