@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && lower(request.auth.token.email) == 'admin@panitia.gbhm';
+    }
+
+    // Master data panitia — dibaca semua yang login, ditulis hanya admin
+    match /panitia/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Master data quest — dibaca semua yang login, ditulis hanya admin
+    match /quests/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // General rules (min kata) — dibaca semua yang login, ditulis hanya admin
+    match /rules/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Flag seed/migrasi — hanya admin
+    match /meta/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

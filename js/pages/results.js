@@ -3,7 +3,8 @@ import { formatDate, escapeHtml, initNav } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNav();
-  await GBHMStore.init();
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
 
   const params = new URLSearchParams(window.location.search);
   const searchInput = document.getElementById('searchInput');

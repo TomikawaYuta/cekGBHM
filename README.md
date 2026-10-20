@@ -1,11 +1,12 @@
 <h1 align="center">Sistem Pengecekan GBHM</h1>
 
 <p align="center">
-Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (Garis Besar Haluan Mahasiswa) milik mahasiswa baru. Berjalan 100% di browser — diproses via GitHub Pages, tanpa server & database.
+Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (Garis Besar Haluan Mahasiswa) milik mahasiswa baru. Berjalan 100% di browser — diproses via GitHub Pages. Master data (Panitia/Quest/Rules) disimpan di <b>Firebase Firestore realtime</b> agar semua panitia melihat data yang sama; riwayat upload & hasil tetap lokal di browser masing-masing. Dilindungi login sederhana (2 akun).
 </p>
 
 <p align="center">
 <a href="#fitur">Fitur</a> •
+<a href="#setup-firebase">Setup Firebase</a> •
 <a href="#cara-menjalankan-lokal">Jalankan Lokal</a> •
 <a href="#deployment-github-pages">Deploy</a> •
 <a href="#penggunaan">Penggunaan</a>
@@ -15,17 +16,19 @@ Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (G
 
 ## Fitur
 
+- 🔐 Login sederhana (username + password) — 2 akun: `admin` & `panitia`
 - 📤 Upload file PDF GBHM (drag & drop, maks 10 MB)
 - 🔍 Ekstraksi otomatis teks & deteksi gambar dari PDF (pdf.js di browser)
 - ✅ Validasi otomatis berdasarkan Master Data
 - 📊 Laporan hasil validasi detail (Lolos / Tidak Lolos + pesan error)
 - 🖼️ Deteksi keberadaan pas foto
-- 📝 CRUD Master Data (Panitia, Quest, Rules) via localStorage
+- 📝 CRUD Master Data (Panitia, Quest, Rules) — **realtime via Firebase Firestore**, hanya admin yang bisa menulis
+- 🔄 Sinkronisasi realtime — perubahan master data langsung terlihat di semua browser panitia
 - 🎯 Deteksi duplikasi NIM & profil copy-paste
 - 🔤 Validasi format NIM (11 digit angka)
 - 📏 Validasi minimum kata (First Impression & Paling Berkesan)
 - 🔎 Pencarian riwayat hasil
-- 🚫 Tanpa login, tanpa backend — semua diproses di browser
+- 📁 Riwayat upload & hasil disimpan per-browser (localStorage) — tidak dibagikan
 
 ## Tech Stack
 
@@ -35,8 +38,38 @@ Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (G
 | Styling | Tailwind CSS (CDN) |
 | Logic | JavaScript vanilla (ES Modules) |
 | PDF Parser | pdf.js (Mozilla) |
-| Penyapan | localStorage |
+| Database realtime | Firebase Firestore (CDN) — master data bersama |
+| Auth | Firebase Auth (Email/Password) |
+| Penyimpanan lokal | localStorage (sessions/upload per-browser) |
 | Deploy | GitHub Pages |
+
+---
+
+## Setup Firebase
+
+> Wajib sekali sebelum website bisa dipakai. Gratis (Spark plan cukup untuk kegiatan panitia).
+> **Panduan lengkap langkah demi langkah:** buka [`TUTORIAL-FIREBASE.md`](TUTORIAL-FIREBASE.md).
+
+1. **Buat project** — buka [console.firebase.google.com](https://console.firebase.google.com) → *Add project* (nama bebas, mis. `cek-gbhm`).
+2. **Tambah Web App** — ikon `</>` → daftarkan app → **copy config** (objek `firebaseConfig`) → tempel ke `js/firebase-config.js` (ganti placeholder).
+3. **Aktifkan Auth** — menu **Build → Authentication → Get started → Email/Password → Enable**.
+4. **Buat 2 akun** — tab **Users → Add user**, buat persis:
+   | Email | Password |
+   |-------|----------|
+   | `admin@panitia.gbhm` | (pilih sendiri, catat) |
+   | `panitia@panitia.gbhm` | (pilih sendiri, bisa sama) |
+5. **Buat Firestore** — menu **Build → Firestore Database → Create database** → pilih **Production mode** → region **asia-southeast1** (terdekat Indonesia) → *Enable*.
+6. **Pasang aturan keamanan** — tab **Rules** → hapus isi bawaan → tempel seluruh isi file `firestore.rules` → **Publish**.
+7. **Login pertama sebagai `admin` di browser Anda** — data master lama (jika ada di localStorage) otomatis ter-migrasi ke Firestore; kalau belum ada, di-seed dari `js/data/master-data.json`.
+
+> ⚠️ **Login `admin` dulu sebelum mengundang panitia lain** — supaya data master milik Anda yang dimigrasi (bukan data seed kosong dari browser orang lain).
+
+Aturan akses yang diberlakukan (via `firestore.rules`):
+
+| Akun | Baca master | Tulis master | Upload PDF |
+|------|-------------|--------------|------------|
+| `admin` | ✅ | ✅ | ✅ |
+| `panitia` | ✅ | ❌ (ditolak server) | ✅ |
 
 ---
 
@@ -81,7 +114,7 @@ git push origin main
 
 Semua path di HTML relatif, jadi situs berfungsi di base path mana pun tanpa konfigurasi tambahan.
 
-> **Catatan:** Railway, database, dan seluruh kode PHP/Laravel sudah dihapus dari repo ini. Dokumentasi versi lama tersimpan sebagai riwayat di `docs/` (git-ignored).
+> **Catatan:** Railway & seluruh kode PHP/Laravel sudah dihapus. Database realtime kini memakai **Firebase Firestore** (lihat [Setup Firebase](#setup-firebase)) — tanpa server/backend sendiri. Dokumentasi versi lama tersimpan sebagai riwayat di `docs/` (git-ignored).
 
 ---
 
@@ -91,6 +124,7 @@ Semua path di HTML relatif, jadi situs berfungsi di base path mana pun tanpa kon
 
 | Halaman | URL |
 |---------|-----|
+| Login | `login.html` |
 | Dashboard | `index.html` |
 | Upload PDF | `upload.html` |
 | Hasil Validasi | `results.html` |
@@ -99,31 +133,45 @@ Semua path di HTML relatif, jadi situs berfungsi di base path mana pun tanpa kon
 | Data Quest | `quest.html` |
 | General Rules | `rules.html` |
 
+Semua halaman (kecuali login) butuh login — jika belum masuk, otomatis dialihkan ke `login.html`. Navbar menampilkan username aktif + tombol **Keluar**.
+
 ### Alur Penggunaan
 
-1. Buka **Upload** → drag & drop file PDF GBHM → **Upload & Validasi**
-2. Sistem mengekstrak teks PDF, memetakan halaman (cover/panitia/angkatan), lalu menjalankan semua aturan validasi
-3. Hasil otomatis tampil di **Detail Hasil** (ringkasan + tabel error per profil)
-4. Kelola **Master Panitia/Quest/Rules** sesuai kebutuhan (perubahan tersimpan di browser)
-5. Gunakan **Hasil** untuk mencari riwayat upload sebelumnya
+1. **Login** dengan username + password (akun `admin` atau `panitia`)
+2. Buka **Upload** → drag & drop file PDF GBHM → **Upload & Validasi**
+3. Sistem mengekstrak teks PDF, memetakan halaman (cover/panitia/angkatan), lalu menjalankan semua aturan validasi
+4. Hasil otomatis tampil di **Detail Hasil** (ringkasan + tabel error per profil)
+5. Akun **admin** kelola **Master Panitia/Quest/Rules** — perubahan tersimpan di Firestore dan **langsung terlihat realtime** di semua browser panitia yang sedang membuka situs
+6. Akun **panitia** hanya bisa melihat master data (tombol Tambah/Edit/Hapus tidak tampil) + upload
+7. Gunakan **Hasil** untuk mencari riwayat upload sebelumnya (riwayat per-browser)
 
 ### Data & Penyimpanan
 
-- Semua data disimpan di `localStorage` browser masing-masing — **tidak sinkron** antar device/browser.
-- Master data di-seed otomatis dari `js/data/master-data.json` saat pertama dibuka.
-- Untuk reset master data ke bawaan, jalankan di console browser:
+| Data | Lokasi | Dibagikan? |
+|------|--------|-----------|
+| Master Panitia/Quest/Rules | Firebase Firestore | ✅ Semua login melihat sama, realtime |
+| Riwayat upload + hasil validasi | `localStorage` browser masing-masing | ❌ Per-browser, tidak disinkron |
+
+- Seed awal master data dari `js/data/master-data.json` (atau migrasi data lama) dijalankan saat **admin** login pertama.
+- Untuk reset data lokal di browser, jalankan di console:
   ```js
   GBHMStore.reset(); location.reload();
   ```
+  (Reset lokal hanya mempengaruhi sesi login & salinan lokal; data di Firestore tidak ikut terhapus.)
 
 ### Troubleshooting
 
 | Masalah | Solusi |
 |---------|--------|
+| Selalu redirect ke login | Belum login / sesi expired — masuk ulang dengan username & password |
+| Data master kosong | Pastikan **admin** sudah login sekali (seed/migrasi) — cek koneksi & Rules sudah di-Publish |
+| "Permission denied" saat simpan | Akun `panitia` memang tidak boleh menulis master data — login sebagai `admin` |
+| Master data tidak muncul realtime | Cek koneksi internet; cek Rules Firestore sudah benar; pastikan keduanya login akun berbeda |
 | PDF gagal diproses | Pastikan PDF bukan hasil scan/gambar (harus ada teks yang bisa dibaca) |
 | Halaman kosong / module error | Akses lewat `http://localhost:8000`, bukan `file://` |
-| Data "hilang" | Data per-browser; cek apakah memakai browser/incognito yang sama |
-| pdf.js gagal load | Pastikan koneksi internet aktif (library dimuat dari CDN) |
+| Riwayat upload "hilang" | Riwayat per-browser; cek memakai browser yang sama (bukan incognito) |
+| pdf.js / Firebase gagal load | Pastikan koneksi internet aktif (library dimuat dari CDN) |
+| Lupa password | Reset via Firebase Console → Authentication → Users |
 
 ---
 

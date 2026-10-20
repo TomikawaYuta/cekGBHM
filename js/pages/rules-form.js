@@ -3,7 +3,13 @@ import { qs, showAlert, initNav } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNav();
-  await GBHMStore.init();
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
+
+  if (!GBHMStore.isAdmin()) {
+    window.location.href = 'rules.html';
+    return;
+  }
 
   const id = qs('id');
   const form = document.getElementById('ruleForm');
@@ -26,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     titleEl.textContent = 'Tambah Rule';
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     alertBox.innerHTML = '';
 
@@ -37,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-      GBHMStore.saveRule(data, id || null);
+      await GBHMStore.saveRule(data, id || null);
       window.location.href = `rules.html?msg=${encodeURIComponent(id ? 'Rule berhasil diupdate' : 'Rule berhasil ditambahkan')}`;
     } catch (err) {
       showAlert(alertBox, 'error', err.message);

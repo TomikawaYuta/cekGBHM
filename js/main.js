@@ -1,6 +1,7 @@
 /**
  * Helper bersama untuk semua halaman.
  */
+import { activeUsername, isAdminUser, logout, onAuthChange } from './auth.js';
 export function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -74,4 +75,44 @@ export function initNav() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initNav);
+/**
+ * Isi navbar: nama user aktif, role (Admin/Panitia), tombol Keluar,
+ * dan visibility elemen [data-admin-only].
+ */
+export function initAuthUi() {
+  const usernameEl = document.getElementById('authUsername');
+  const roleEl = document.getElementById('authRole');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (logoutBtn && !logoutBtn.dataset.bound) {
+    logoutBtn.dataset.bound = '1';
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await logout();
+      } catch (e) {
+        console.error(e);
+      }
+      window.location.href = 'login.html';
+    });
+  }
+
+  onAuthChange((user) => {
+    if (!user) return;
+    const admin = isAdminUser(user);
+    if (usernameEl) usernameEl.textContent = activeUsername(user);
+    if (roleEl) {
+      roleEl.textContent = admin ? 'Admin' : 'Panitia';
+      roleEl.className = admin
+        ? 'px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700'
+        : 'px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700';
+    }
+    document.querySelectorAll('[data-admin-only]').forEach((el) => {
+      el.classList.toggle('hidden', !admin);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initNav();
+  initAuthUi();
+});

@@ -23,6 +23,13 @@
                         <a href="rules.html" data-nav="rules" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md">Rules</a>
                     </div>
                 </div>
+                <div class="flex items-center space-x-3">
+                    <span class="hidden sm:flex items-center space-x-2 text-sm text-gray-500">
+                        <span id="authUsername" class="font-medium text-gray-800">-</span>
+                        <span id="authRole" class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700"></span>
+                    </span>
+                    <button id="logoutBtn" type="button" class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md text-sm">Keluar</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -33,8 +40,8 @@
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h1 class="text-xl font-semibold text-gray-800">General Rules</h1>
-                <a href="rules-form.html"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                <a href="rules-form.html" data-admin-only
+                   class="hidden bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
                     + Tambah Rule
                 </a>
             </div>

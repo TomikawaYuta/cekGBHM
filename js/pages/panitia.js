@@ -3,12 +3,14 @@ import { escapeHtml, showFlashFromQuery, initNav } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNav();
-  await GBHMStore.init();
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
   showFlashFromQuery(document.getElementById('alertBox'));
 
   const searchInput = document.getElementById('searchInput');
 
   function render() {
+    const admin = GBHMStore.isAdmin();
     const q = searchInput.value.toLowerCase().trim();
     let list = GBHMStore.getPanitia();
     if (q) {
@@ -36,17 +38,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           </ul>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-          <a href="panitia-form.html?id=${encodeURIComponent(p.id)}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-          <button type="button" data-delete="${encodeURIComponent(p.id)}" class="text-red-600 hover:text-red-900">Hapus</button>
+          ${admin
+            ? `<a href="panitia-form.html?id=${encodeURIComponent(p.id)}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+               <button type="button" data-delete="${encodeURIComponent(p.id)}" class="text-red-600 hover:text-red-900">Hapus</button>`
+            : '<span class="text-gray-400">-</span>'}
         </td>
       </tr>
     `).join('');
 
     tbody.querySelectorAll('[data-delete]').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         if (window.confirm('Yakin hapus?')) {
-          GBHMStore.deletePanitia(btn.dataset.delete);
-          window.location.href = 'panitia.html?msg=' + encodeURIComponent('Data panitia berhasil dihapus');
+          try {
+            await GBHMStore.deletePanitia(btn.dataset.delete);
+            window.location.href = 'panitia.html?msg=' + encodeURIComponent('Data panitia berhasil dihapus');
+          } catch (err) {
+            window.alert(err.message);
+          }
         }
       });
     });
@@ -59,4 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   searchInput.addEventListener('input', render);
 
   render();
+  GBHMStore.subscribe((name) => {
+    if (name === 'panitia') render();
+  });
 });

@@ -1,8 +1,7 @@
 import { GBHMStore } from '../store.js';
 import { formatDate, escapeHtml, statusPill } from '../main.js';
 
-async function render() {
-  await GBHMStore.init();
+function render() {
   const stats = GBHMStore.getStats();
 
   document.getElementById('statPanitia').textContent = stats.totalPanitia;
@@ -27,4 +26,10 @@ async function render() {
   `).join('');
 }
 
-document.addEventListener('DOMContentLoaded', render);
+document.addEventListener('DOMContentLoaded', async () => {
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
+  render();
+  // Realtime: statistik ikut berubah saat master data diubah di browser lain
+  GBHMStore.subscribe(render);
+});

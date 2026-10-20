@@ -7,7 +7,8 @@ function escapeAttr(value) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNav();
-  await GBHMStore.init();
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
 
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');

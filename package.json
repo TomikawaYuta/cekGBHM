@@ -2,7 +2,7 @@
   "name": "cekghbm-github-io",
   "private": true,
   "type": "module",
-  "description": "Situs statis Sistem Pengecekan GBHM (HTML/CSS/JS + localStorage)",
+  "description": "Situs statis Sistem Pengecekan GBHM (HTML/CSS/JS + Firebase Firestore realtime + localStorage)",
   "scripts": {
     "test": "node tests/smoke.test.js",
     "serve": "npx --yes serve ."

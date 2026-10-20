@@ -3,7 +3,13 @@ import { qs, showAlert, initNav } from '../main.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNav();
-  await GBHMStore.init();
+  const ready = await GBHMStore.init();
+  if (ready === false) return;
+
+  if (!GBHMStore.isAdmin()) {
+    window.location.href = 'quest.html';
+    return;
+  }
 
   const id = qs('id');
   const form = document.getElementById('questForm');
@@ -28,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     titleEl.textContent = 'Tambah Quest';
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     alertBox.innerHTML = '';
 
@@ -41,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-      GBHMStore.saveQuest(data, id || null);
+      await GBHMStore.saveQuest(data, id || null);
       window.location.href = `quest.html?msg=${encodeURIComponent(id ? 'Data quest berhasil diupdate' : 'Data quest berhasil ditambahkan')}`;
     } catch (err) {
       showAlert(alertBox, 'error', err.message);
