@@ -48,7 +48,7 @@ Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (G
 ## Setup Firebase
 
 > Wajib sekali sebelum website bisa dipakai. Gratis (Spark plan cukup untuk kegiatan panitia).
-> **Panduan lengkap langkah demi langkah:** buka [`TUTORIAL-FIREBASE.md`](TUTORIAL-FIREBASE.md).
+> **Panduan lengkap langkah demi langkah:** buka [`docs/TUTORIAL-FIREBASE.md`](docs/TUTORIAL-FIREBASE.md).
 
 1. **Buat project** — buka [console.firebase.google.com](https://console.firebase.google.com) → *Add project* (nama bebas, mis. `cek-gbhm`).
 2. **Tambah Web App** — ikon `</>` → daftarkan app → **copy config** (objek `firebaseConfig`) → tempel ke `js/firebase-config.js` (ganti placeholder).
@@ -60,7 +60,7 @@ Situs web statis (HTML/CSS/JS) untuk mengotomatisasi pengecekan file PDF GBHM (G
    | `panitia@panitia.gbhm` | (pilih sendiri, bisa sama) |
 5. **Buat Firestore** — menu **Build → Firestore Database → Create database** → pilih **Production mode** → region **asia-southeast1** (terdekat Indonesia) → *Enable*.
 6. **Pasang aturan keamanan** — tab **Rules** → hapus isi bawaan → tempel seluruh isi file `firestore.rules` → **Publish**.
-7. **Login pertama sebagai `admin` di browser Anda** — data master lama (jika ada di localStorage) otomatis ter-migrasi ke Firestore; kalau belum ada, di-seed dari `js/data/master-data.json`.
+7. **Login pertama sebagai `admin` di browser Anda** — buka `http://localhost:8000/login.html` (atau `https://<username>.github.io/` yang otomatis dialihkan ke `login.html`), isi username `admin` + password dari langkah 4. Data master lama (jika ada di localStorage) otomatis ter-migrasi ke Firestore; kalau belum ada, di-seed dari `js/data/master-data.json`.
 
 > ⚠️ **Login `admin` dulu sebelum mengundang panitia lain** — supaya data master milik Anda yang dimigrasi (bukan data seed kosong dari browser orang lain).
 
@@ -91,6 +91,16 @@ npx serve .                      # Node
 ```
 
 Buka `http://localhost:8000`. Tidak perlu install dependency apa pun.
+
+Cek kesehatan kode (validasi rule + pemeriksaan modul ES):
+
+```bash
+npm test
+```
+
+> Test termasuk pemeriksaan statis `js/**`: **tidak boleh ada import bare specifier**
+> (mis. `from "firebase/app"`) dan **tidak boleh ada nama import duplikat** — keduanya
+> membuat seluruh modul gagal dimuat (situs terbuka tapi login & tombol Keluar mati).
 
 ---
 
@@ -163,6 +173,8 @@ Semua halaman (kecuali login) butuh login — jika belum masuk, otomatis dialihk
 
 | Masalah | Solusi |
 |---------|--------|
+| Website terbuka langsung ke dashboard — **tidak ada login**, atau tombol **Keluar** tidak bereaksi | Tab Console (F12) penuh error module → biasanya `js/firebase-config.js` ikut memuat baris bawaan console `import { initializeApp } from "firebase/app"`. Hapus baris itu (hanya boleh import `https://www.gstatic.com/...`), simpan, lalu jalankan `npm test` |
+| Form login tidak merespons sama sekali | Penyebab sama dengan baris di atas — seluruh ES module gagal dimuat sehingga handler form tidak terpasang |
 | Selalu redirect ke login | Belum login / sesi expired — masuk ulang dengan username & password |
 | Data master kosong | Pastikan **admin** sudah login sekali (seed/migrasi) — cek koneksi & Rules sudah di-Publish |
 | "Permission denied" saat simpan | Akun `panitia` memang tidak boleh menulis master data — login sebagai `admin` |

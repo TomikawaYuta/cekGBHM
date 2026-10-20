@@ -4,6 +4,9 @@
  * Jalankan: node tests/smoke.test.js
  */
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { similarText, fuzzyMatch } from '../js/validate/similarity.js';
 import { checkPanitia, checkAngkatan } from '../js/validate/rules/completeness.js';
 import { checkTextLength } from '../js/validate/rules/text-length.js';
@@ -227,6 +230,63 @@ test('validasi → angkatan lolos (quest & NIM ok)', () => {
   const angkatan = results.filter((r) => r.profil_type === 'angkatan' && r.profil_name !== 'Validasi Duplikasi Global' && r.profil_name !== 'Validasi Jumlah Profil');
   assert.equal(angkatan.length, 2);
   for (const a of angkatan) assert.equal(a.status, 'lolos');
+});
+
+console.log('static check — modul ES (js/**):');
+
+const JS_ROOT = fileURLToPath(new URL('../js', import.meta.url));
+
+function walkJs(dir) {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) return walkJs(path);
+    return path.endsWith('.js') ? [path] : [];
+  });
+}
+
+function isBare(spec) {
+  return !/^(\.\/|\.\.\/|\/|https?:|data:|node:)/.test(spec);
+}
+
+test('semua import specifier URL absolut / path relatif (tanpa bare specifier)', () => {
+  const offenders = [];
+  for (const file of walkJs(JS_ROOT)) {
+    const src = readFileSync(file, 'utf8');
+    const specs = [
+      ...src.matchAll(/\bfrom\s*['"]([^'"]+)['"]/g),
+      ...src.matchAll(/^\s*import\s*['"]([^'"]+)['"]/gm),
+    ].map((m) => m[1]);
+    for (const spec of specs) {
+      if (isBare(spec)) offenders.push(`${file.replace(/\\/g, '/')}: ${spec}`);
+    }
+  }
+  assert.deepEqual(
+    offenders,
+    [],
+    `import bare specifier tidak bisa di-resolve browser:\n      ${offenders.join('\n      ')}`,
+  );
+});
+
+test('tidak ada nama binding import yang duplikat dalam satu file', () => {
+  const offenders = [];
+  for (const file of walkJs(JS_ROOT)) {
+    const src = readFileSync(file, 'utf8');
+    const locals = [];
+    for (const m of src.matchAll(/\bimport\s*\{([^}]*)\}\s*from\s*['"][^'"]+['"]/g)) {
+      for (const part of m[1].split(',')) {
+        const name = part.trim();
+        if (!name) continue;
+        locals.push(name.includes(' as ') ? name.split(/\s+as\s+/).pop() : name);
+      }
+    }
+    const dup = locals.filter((name, i) => locals.indexOf(name) !== i);
+    if (dup.length) offenders.push(`${file.replace(/\\/g, '/')}: ${[...new Set(dup)].join(', ')}`);
+  }
+  assert.deepEqual(
+    offenders,
+    [],
+    `nama binding import duplikat (SyntaxError di browser):\n      ${offenders.join('\n      ')}`,
+  );
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

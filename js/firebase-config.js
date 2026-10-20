@@ -3,7 +3,6 @@
  * Project Settings (ikon gear) → Your apps → SDK setup and configuration → npm/module
  * Ganti setiap nilai placeholder 'ISI_...' di bawah, lalu simpan.
  */
-import { initializeApp } from "firebase/app";
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
